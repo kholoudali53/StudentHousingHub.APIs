@@ -46,7 +46,7 @@ namespace StudentHousingHub.Repository.Data.Configurations
             builder.Property(a => a.Description)
                 .HasMaxLength(2000);
 
-            builder.Property(a => a.TotalPrice)
+            builder.Property(a => a.PriceMonthly)
                 .IsRequired()
                 .HasColumnType("decimal(18,2)");
 

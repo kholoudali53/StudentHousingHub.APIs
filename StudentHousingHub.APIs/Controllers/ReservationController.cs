@@ -25,7 +25,7 @@ namespace StudentHousingHub.APIs.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(ReservationDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ReservationResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
         [Authorize]
         public async Task<IActionResult> CreateReservation([FromBody] ReservationDto reservationDto)
@@ -58,6 +58,25 @@ namespace StudentHousingHub.APIs.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to create reservation. Message: {Message}", ex.Message);
+                return BadRequest(new ApiErrorResponse(400, ex.Message));
+            }
+        }
+
+        [HttpGet("search")]
+        [ProducesResponseType(typeof(IEnumerable<ReservationDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
+        [Authorize]
+        public async Task<IActionResult> SearchReservations([FromQuery] SearchReservationDto searchDto)
+        {
+            try
+            {
+                _logger.LogInformation("Searching reservations with criteria");
+                var results = await _reservationService.SearchReservationsAsync(searchDto);
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while searching reservations");
                 return BadRequest(new ApiErrorResponse(400, ex.Message));
             }
         }

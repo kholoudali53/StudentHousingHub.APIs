@@ -3,6 +3,7 @@ using StudentHousingHub.Core.Specifications;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,6 +23,10 @@ namespace StudentHousingHub.Core.Repository.Interface
         Task<int> GetCountAsync(ISpecifications<TEntity, TKey> Spec);
 
         Task<TEntity> GetUserByNationalIDAsync(string NationalID);
+        
+        // add
+        Task<IEnumerable<TEntity>> GetWhereAsync(Expression<Func<TEntity, bool>> predicate);
+
 
         Task AddAsync(TEntity entity);
         void Update(TEntity entity);

@@ -6,6 +6,7 @@ using StudentHousingHub.Repository.Data.Contexts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -87,10 +88,10 @@ namespace StudentHousingHub.Repository.Repositories
             return await ApplySpecifications(Spec).CountAsync();
         }
 
-        public async Task<int> Commit()
-        {
-            return await _context.SaveChangesAsync();
-        }
+        //public async Task<int> Commit()
+        //{
+        //    return await _context.SaveChangesAsync();
+        //}
 
         public async Task<TEntity> GetByIdAsync(TKey id)
         {
@@ -109,9 +110,9 @@ namespace StudentHousingHub.Repository.Repositories
             return await query.FirstOrDefaultAsync(e => e.id.Equals(id));
         }
 
-        //async Task<int> Commit(TEntity entity)
-        //{
-        //    return await _context.SaveChangesAsync();
-        //}
+        public async Task<IEnumerable<TEntity>> GetWhereAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await _context.Set<TEntity>().Where(predicate).ToListAsync();
+        }
     }
 }

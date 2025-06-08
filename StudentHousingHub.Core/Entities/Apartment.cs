@@ -34,7 +34,7 @@ namespace StudentHousingHub.Core.Entities
         public Amenities? Amenities { get; set; }
         public string Description { get; set; }
 
-        public decimal TotalPrice { get; set; }
+        public decimal PriceMonthly { get; set; }
 
         // Foreign Key for Owner
         public int OwnerId { get; set; }

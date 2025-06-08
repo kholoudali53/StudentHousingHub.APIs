@@ -113,6 +113,9 @@ namespace StudentHousingHub.Repository.Data.Migrations
                     b.Property<int>("OwnerId")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("PriceMonthly")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<decimal>("Space")
                         .HasColumnType("decimal(18,2)");
 
@@ -120,9 +123,6 @@ namespace StudentHousingHub.Repository.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("UniversityName")
                         .IsRequired()
@@ -375,7 +375,8 @@ namespace StudentHousingHub.Repository.Data.Migrations
 
                     b.Property<string>("RoomNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -395,8 +396,6 @@ namespace StudentHousingHub.Repository.Data.Migrations
                     b.ToTable("Reservations", t =>
                         {
                             t.HasCheckConstraint("CK_Reservations_Dates", "[CheckOutDate] > [CheckInDate]");
-
-                            t.HasCheckConstraint("CK_Reservations_RoomNumber", "[RoomNumber] BETWEEN 1 AND 10");
                         });
                 });
 

@@ -9,7 +9,8 @@ namespace StudentHousingHub.Core.Services.Interface
 {
     public interface IReservationService
     {
-        Task<ReservationDto> CreateReservationAsync(ReservationDto reservationDto);
+        Task<ReservationResponseDto> CreateReservationAsync(ReservationDto reservationDto);
+        Task<IEnumerable<ReservationDto>> SearchReservationsAsync(SearchReservationDto searchDto);
     }
 }
 

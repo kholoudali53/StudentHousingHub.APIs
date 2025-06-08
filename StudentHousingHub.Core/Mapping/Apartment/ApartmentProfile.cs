@@ -24,17 +24,18 @@ namespace StudentHousingHub.Core.Mapping.Apartment
 
             CreateMap<Entities.Apartment, ApartmentDto>()
             .ForMember(d => d.OwnerName, O => O.MapFrom(s => $"{s.Owner.FirstName} {s.Owner.LastName}".Trim()))
-             
-            .ForMember(dest => dest.AvailableRooms,
-                       opt => opt.MapFrom(src => src.Rooms)) // Map Rooms to AvailableRooms
+            .ForMember(dest => dest.AvailableRooms, opt => opt.MapFrom(src => src.Rooms))
+            .ForMember(d => d.Images, O => O.MapFrom(new PictureUrlResolver(configuration)))
+            .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.PriceMonthly));
 
-           .ForMember(d => d.Images, O => O.MapFrom(new PictureUrlResolver(configuration)));
+            CreateMap<AddApartmentDto, Entities.Apartment>()
+                .ForMember(dest => dest.Rooms, opt => opt.MapFrom(src => src.AvailableRooms));
 
-            CreateMap<AddApartmentDto, Entities.Apartment>();
-            CreateMap<Beds, BedDto>();
+            CreateMap<Beds, BedDto>().ReverseMap();
+
             CreateMap<Rooms, RoomDto>()
-                .ForMember(dest => dest.AvailableBeds, opt => opt.MapFrom(src => src.Beds.Count(b => b.IsAvailable)))
-            .ForMember(dest => dest.Beds, opt => opt.MapFrom(src => src.Beds));
+            .ForMember(dest => dest.AvailableBeds, opt => opt.MapFrom(src => src.Beds.Count(b => b.IsAvailable)))
+            .ForMember(dest => dest.Beds, opt => opt.MapFrom(src => src.Beds)).ReverseMap();
 
             CreateMap<Owners, OwnerDto>();
         }
