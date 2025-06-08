@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using StudentHousingHub.Core;
 using StudentHousingHub.Core.Dtos.Apartments;
 using StudentHousingHub.Core.Dtos.Reservation;
@@ -9,6 +10,7 @@ using StudentHousingHub.Core.Services.Interface;
 using StudentHousingHub.Core.Specifications;
 using StudentHousingHub.Core.Specifications.Apartments;
 using StudentHousingHub.Repository;
+using StudentHousingHub.Repository.Data.Contexts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,47 +23,86 @@ namespace StudentHousingHub.Service.Services.Rooms
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly AppDbContext _context;
 
-        public ApartmentService(IUnitOfWork unitOfWork, IMapper mapper)
+        public ApartmentService(IUnitOfWork unitOfWork, IMapper mapper, AppDbContext context)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _context = context;
         }
 
         public async Task<PaginationResponse<ApartmentDto>> GetAllApartmentsAsync(ApartmentSpecParameters apartmentSpecParameters)
         {
             var spec = new ApartmentSpecification(apartmentSpecParameters);
 
-            var apartments = await _unitOfWork.Repository<Core.Entities.Apartment, int>().GetAllWithSpecAsync(spec);
+            var apartments = await _unitOfWork.Repository<Apartment, int>().GetAllWithSpecAsync(spec);
+
+            foreach (var apartment in apartments)
+            {
+                await _unitOfWork.Repository<Apartment, int>()
+                    .GetByIdAsync(apartment.id, include: q => q
+                        .Include(a => a.Owner)
+                        .Include(a => a.Rooms)
+                            .ThenInclude(r => r.Beds));
+            }
+
             var mappedRooms = _mapper.Map<IEnumerable<ApartmentDto>>(apartments);
 
             var countSpec = new ApartmentWithCountSpecification(apartmentSpecParameters);
-            var count = await _unitOfWork.Repository<Core.Entities.Apartment, int>().GetCountAsync(countSpec);
+            var count = await _unitOfWork.Repository<Apartment, int>().GetCountAsync(countSpec);
             return new PaginationResponse<ApartmentDto>(apartmentSpecParameters.PageSize, apartmentSpecParameters.PageIndex, 0, mappedRooms);
+        
         }
 
         public async Task<ApartmentDto> GetApartmentByIdAsync(int id)
         {
             var spec = new ApartmentSpecification(id);
-            return _mapper.Map<ApartmentDto>(await _unitOfWork.Repository<Core.Entities.Apartment, int>().GetWithSpecAsync(spec));
+            var apartment = await _unitOfWork.Repository<Apartment, int>()
+                .GetWithSpecAsync(spec);
+
+            if (apartment == null)
+                return null;
+
+            if (apartment.Rooms != null && apartment.Rooms.Any(r => r.Beds == null || !r.Beds.Any()))
+            {
+                // Load all beds for all rooms in one query
+                var roomIds = apartment.Rooms.Select(r => r.id).ToList();
+                var allBeds = await _context.Beds
+                    .Where(b => roomIds.Contains(b.RoomId))
+                    .ToListAsync();
+
+                // Assign beds to their rooms
+                foreach (var room in apartment.Rooms)
+                {
+                    room.Beds = allBeds.Where(b => b.RoomId == room.id).ToList();
+                }
+            }
+
+            return _mapper.Map<ApartmentDto>(apartment);
         }
 
 
         public async Task<ApartmentDto> AddApartmentAsync(AddApartmentDto apartmentDto)
         {
-            /*
-            var ownerExists = await _unitOfWork.Repository<Owners, int>().GetByIdAsync(apartmentDto.OwnerId);
-            if (ownerExists == null)
+            var owner = await _unitOfWork.Repository<Owners, int>().GetByIdAsync(apartmentDto.OwnerId);
+            if (owner == null)
             {
-                throw new Exception("Owner not found");
-            }*/
+                throw new KeyNotFoundException($"Owner with ID {apartmentDto.OwnerId} not found");
+            }
 
             var apartment = _mapper.Map<Apartment>(apartmentDto);
 
             await _unitOfWork.Repository<Apartment, int>().AddAsync(apartment);
             await _unitOfWork.CompleteAsync();
 
-            return _mapper.Map<ApartmentDto>(apartment);
+            var fullApartment = await _unitOfWork.Repository<Apartment, int>()
+           .GetByIdAsync(apartment.id, include: q => q
+           .Include(a => a.Owner)
+           .Include(a => a.Rooms)
+           .ThenInclude(r => r.Beds));
+
+            return _mapper.Map<ApartmentDto>(fullApartment);
         }
     }
 }

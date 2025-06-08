@@ -40,8 +40,8 @@ namespace StudentHousingHub.Core.Specifications.Apartments
                     (string.IsNullOrEmpty(parameters.Gender) ||
                     (p.Gender != null && p.Gender.ToLower() == parameters.Gender.ToLower())) &&
                     (!parameters.Floor.HasValue || p.Floor == parameters.Floor) &&
-                    (!parameters.PriceFrom.HasValue || p.TotalPrice >= parameters.PriceFrom) &&
-                    (!parameters.PriceTo.HasValue || p.TotalPrice <= parameters.PriceTo) &&
+                    (!parameters.PriceFrom.HasValue || p.PriceMonthly >= parameters.PriceFrom) &&
+                    (!parameters.PriceTo.HasValue || p.PriceMonthly <= parameters.PriceTo) &&
                     (!parameters.OwnerId.HasValue || parameters.OwnerId == p.OwnerId);
             }
             else // Basic Search
@@ -60,10 +60,10 @@ namespace StudentHousingHub.Core.Specifications.Apartments
                 switch (parameters.Sort.ToLower())
                 {
                     case "priceasc":
-                        AddOrderBy(P => P.TotalPrice);
+                        AddOrderBy(P => P.PriceMonthly);
                         break;
                     case "pricedesc":
-                        AddOrderByDescending(P => P.TotalPrice);
+                        AddOrderByDescending(P => P.PriceMonthly);
                         break;
                     default:
                         AddOrderBy(P => P.UniversityName);

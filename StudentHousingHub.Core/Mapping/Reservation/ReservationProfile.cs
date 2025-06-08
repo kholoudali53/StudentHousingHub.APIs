@@ -16,11 +16,11 @@ namespace StudentHousingHub.Core.Mapping.Reservation
             //CreateMap<Entities.Reservation, ReservationDto>().ReverseMap();
             CreateMap<ReservationDto, Entities.Reservation>()
             .ForMember(dest => dest.Status,
-                       opt => opt.MapFrom(src => Enum.Parse<ReservationStatus>(src.Status)));
+                      opt => opt.MapFrom(src => Enum.Parse<ReservationStatus>(src.Status)));
 
             CreateMap<Entities.Reservation, ReservationDto>()
-                .ForMember(dest => dest.Status,
-                           opt => opt.MapFrom(src => src.Status.ToString()));
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.id))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
         }
     }
 }

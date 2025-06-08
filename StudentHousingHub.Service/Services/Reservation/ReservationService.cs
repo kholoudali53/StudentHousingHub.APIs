@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using StudentHousingHub.Core;
 using StudentHousingHub.Core.Dtos.Reservation;
 using StudentHousingHub.Core.Entities;
 using StudentHousingHub.Core.Exceptions;
 using StudentHousingHub.Core.Services.Interface;
+using StudentHousingHub.Core.Specifications.Reservation;
 using StudentHousingHub.Repository.Data.Contexts;
 using System;
 using System.Collections.Generic;
@@ -27,7 +29,7 @@ namespace StudentHousingHub.Service.Services.Reservation
             _mapper = mapper;
             _logger = logger;
         }
-        public async Task<ReservationDto> CreateReservationAsync(ReservationDto reservationDto)
+        public async Task<ReservationResponseDto> CreateReservationAsync(ReservationDto reservationDto)
         {
             try
             {
@@ -91,7 +93,7 @@ namespace StudentHousingHub.Service.Services.Reservation
 
                 _logger.LogInformation("Reservation created successfully for bed {BedId}", reservation.BedId);
 
-                return _mapper.Map<ReservationDto>(reservation);
+                return new ReservationResponseDto { ReservationId = reservation.BedId };
             }
             catch (Exception ex)
             {
@@ -103,6 +105,15 @@ namespace StudentHousingHub.Service.Services.Reservation
 
                 throw;
             }
+        }
+
+        public async Task<IEnumerable<ReservationDto>> SearchReservationsAsync(SearchReservationDto searchDto)
+        {
+            var spec = new ReservationSpecification(searchDto);
+            var reservations = await _unitOfWork.Repository<Core.Entities.Reservation, int>()
+                .GetAllWithSpecAsync(spec);
+
+            return _mapper.Map<IEnumerable<ReservationDto>>(reservations);
         }
     }
 

@@ -32,15 +32,6 @@ namespace StudentHousingHub.APIs.Controllers
             var result = await _apartmentsService.GetAllApartmentsAsync(apartmentSpecParameters);
             return Ok(result);
         }
-
-        /*
-        [HttpGet("test")] // Get BaseURL/api/Rooms
-        [Authorize]
-        public IActionResult get ()
-        {
-            return Ok("its work ");
-        }
-        */
         
         [ProducesResponseType(typeof(ApartmentDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]

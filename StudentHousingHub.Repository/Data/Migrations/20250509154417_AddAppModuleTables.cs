@@ -102,7 +102,7 @@ namespace StudentHousingHub.Repository.Data.Migrations
                     Floor = table.Column<int>(type: "int", nullable: false),
                     Amenities = table.Column<int>(type: "int", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
-                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PriceMonthly = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     OwnerId = table.Column<int>(type: "int", nullable: false),
                     CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -248,7 +248,7 @@ namespace StudentHousingHub.Repository.Data.Migrations
                     FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     PhoneNo = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    RoomNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RoomNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     NationalId = table.Column<string>(type: "nchar(14)", fixedLength: true, maxLength: 14, nullable: false),
                     CheckInDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CheckOutDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -263,7 +263,6 @@ namespace StudentHousingHub.Repository.Data.Migrations
                 {
                     table.PrimaryKey("PK_Reservations", x => x.id);
                     table.CheckConstraint("CK_Reservations_Dates", "[CheckOutDate] > [CheckInDate]");
-                    table.CheckConstraint("CK_Reservations_RoomNumber", "[RoomNumber] BETWEEN 1 AND 10");
                     table.ForeignKey(
                         name: "FK_Reservations_Apartments_ApartmentId",
                         column: x => x.ApartmentId,

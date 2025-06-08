@@ -21,7 +21,14 @@ namespace StudentHousingHub.Repository.Data.Configurations
             builder.Property(r => r.FirstName).IsRequired().HasMaxLength(50);
             builder.Property(r => r.LastName).IsRequired().HasMaxLength(50);
             builder.Property(r => r.PhoneNo).IsRequired().HasMaxLength(20);
+            builder.Property(r => r.RoomNumber).IsRequired().HasMaxLength(20);
             builder.Property(r => r.NationalId).IsRequired().HasMaxLength(14).IsFixedLength();
+            builder.Property(r => r.CheckInDate)
+               .IsRequired();
+
+            builder.Property(r => r.CheckOutDate)
+                .IsRequired();
+
             builder.Property(r => r.PictureUrl).HasMaxLength(500);
             builder.Property(r => r.Status).HasConversion<string>();
 
@@ -31,19 +38,20 @@ namespace StudentHousingHub.Repository.Data.Configurations
                 .HasForeignKey(r => r.ApartmentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(r => r.Bed)
-           .WithMany()
-           .HasForeignKey(r => r.BedId)
-           .OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(r => r.Bed) 
+               .WithMany()
+               .HasForeignKey(r => r.BedId)
+               .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(r => r.Student)
                 .WithMany()
                 .HasForeignKey(r => r.StudentId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Constrains
+            // Constraints
             builder.HasCheckConstraint("CK_Reservations_Dates", "[CheckOutDate] > [CheckInDate]");
-            builder.HasCheckConstraint("CK_Reservations_RoomNumber", "[RoomNumber] BETWEEN 1 AND 10");
+
+            //builder.HasCheckConstraint("CK_Reservations_RoomNumber", "[RoomNumber] BETWEEN 1 AND 10");
 
         }
     }
