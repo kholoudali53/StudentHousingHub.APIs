@@ -13,9 +13,14 @@ namespace StudentHousingHub.Core.Services.Interface
 {
     public interface IApartmentService
     {
+        //Task<IEnumerable<ApartmentDto>> GetAllApartmentsAsync();
         Task<PaginationResponse<ApartmentDto>> GetAllApartmentsAsync(ApartmentSpecParameters roomSpecParameters);
         Task<ApartmentDto> GetApartmentByIdAsync(int id);
 
         Task<ApartmentDto> AddApartmentAsync(AddApartmentDto apartmentDto);
+
+        Task<bool> DeleteApartmentAsync(int id);
+        Task<bool> SuspendApartmentAsync(int id);
+        Task<bool> ActiveApartmentAsync(int id);
     }
 }

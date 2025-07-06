@@ -39,7 +39,8 @@ namespace StudentHousingHub.Core.Specifications.Apartments
                     (p.Address != null && p.Address.ToLower().Contains(parameters.Address.ToLower()))) &&
                     (string.IsNullOrEmpty(parameters.Gender) ||
                     (p.Gender != null && p.Gender.ToLower() == parameters.Gender.ToLower())) &&
-                    (!parameters.Floor.HasValue || p.Floor == parameters.Floor) &&
+                    (string.IsNullOrEmpty(parameters.Floor) ||
+                    (p.Floor != null && p.Floor.ToLower() == parameters.Floor.ToLower())) &&
                     (!parameters.PriceFrom.HasValue || p.PriceMonthly >= parameters.PriceFrom) &&
                     (!parameters.PriceTo.HasValue || p.PriceMonthly <= parameters.PriceTo) &&
                     (!parameters.OwnerId.HasValue || parameters.OwnerId == p.OwnerId);

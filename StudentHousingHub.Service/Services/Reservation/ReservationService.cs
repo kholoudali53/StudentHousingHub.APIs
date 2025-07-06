@@ -115,118 +115,64 @@ namespace StudentHousingHub.Service.Services.Reservation
 
             return _mapper.Map<IEnumerable<ReservationDto>>(reservations);
         }
+
+        public async Task<bool> CancelReservationAsync(int reservationId)
+        {
+            try
+            {
+                _logger.LogDebug("Starting reservation cancellation process for reservation ID {ReservationId}", reservationId);
+
+                // Get the reservation
+                var reservation = await _unitOfWork.Repository<Core.Entities.Reservation, int>().GetByIdAsync(reservationId);
+
+                if (reservation == null)
+                {
+                    _logger.LogError("Reservation with ID {ReservationId} not found", reservationId);
+                    throw new KeyNotFoundException($"Reservation with ID {reservationId} not found");
+                }
+
+                // Check if reservation is already cancelled
+                if (reservation.Status == ReservationStatus.Cancelled)
+                {
+                    _logger.LogWarning("Reservation {ReservationId} is already cancelled", reservationId);
+                    return false;
+                }
+
+                if (reservation.Status == ReservationStatus.Completed)
+                {
+                    _logger.LogWarning("Cannot cancel completed reservation {ReservationId}", reservationId);
+                    throw new InvalidOperationException("Cannot cancel a completed reservation");
+                }
+
+                // Get the associated bed
+                var bed = await _unitOfWork.Repository<Beds, int>().GetByIdAsync(reservation.BedId);
+                if (bed == null)
+                {
+                    _logger.LogError("Associated bed with ID {BedId} not found", reservation.BedId);
+                    throw new KeyNotFoundException($"Associated bed with ID {reservation.BedId} not found");
+                }
+
+                // Update reservation status
+                reservation.Status = ReservationStatus.Cancelled;
+                _unitOfWork.Repository<Core.Entities.Reservation, int>().Update(reservation);
+
+                // Mark bed as available again
+                bed.IsAvailable = true;
+                _unitOfWork.Repository<Beds, int>().Update(bed);
+
+                // Save changes
+                await _unitOfWork.CompleteAsync();
+
+                _logger.LogInformation("Reservation {ReservationId} cancelled successfully", reservationId);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error cancelling reservation {ReservationId}", reservationId);
+                throw;
+            }
+        }
+
     }
 
 }
-
-/*
- * private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-
-        public ReservationService(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
-
-
-        public async Task<ReservationDto> MakeReservation(ReservationDto reservationDto)
-        {
-            var apartmentRepo = _unitOfWork.Repository<Apartment, int>();
-            var reservationRepo = _unitOfWork.Repository<Core.Entities.Reservation, int>();
-            var bedRepo = _unitOfWork.Repository<Beds, int>();
-            var roomRepo = _unitOfWork.Repository<Core.Entities.Rooms, int>();
-
-            // Get apartment with included rooms and beds
-            var apartment = await apartmentRepo.GetByIdAsync(
-                reservationDto.ApartmentId,
-                include: query => query.Include(a => a.Rooms)
-                                      .ThenInclude(r => r.Beds));
-
-            if (apartment == null)
-                throw new NotFoundException("Apartment not found");
-
-            if (!apartment.IsAvailable)
-                throw new BadRequestException("Apartment is not available");
-
-            var bed = apartment.Rooms
-                .SelectMany(r => r.Beds)
-                .FirstOrDefault(b => b.id == reservationDto.BedId && b.IsAvailable);
-
-            if (bed == null)
-                throw new BadRequestException("Bed is not available");
-
-            var reservation = _mapper.Map<Core.Entities.Reservation>(reservationDto);
-            reservation.Status = ReservationStatus.Pending;
-
-            await reservationRepo.AddAsync(reservation);
-
-            // Update bed status
-            bed.IsAvailable = false;
-            bedRepo.Update(bed);
-
-            // Update room available beds
-            var room = bed.Room;
-            room.AvailableBeds--;
-            roomRepo.Update(room);
-
-            // Update apartment available beds
-            apartment.AvailableBeds--;
-            apartmentRepo.Update(apartment);
-
-            await _unitOfWork.CompleteAsync();
-
-            return _mapper.Map<ReservationDto>(reservation);
-
-
-        }
-
-        public async Task ConfirmReservation(int reservationId)
-        {
-            var reservationRepo = _unitOfWork.Repository<Core.Entities.Reservation, int>();
-
-            var reservation = await reservationRepo.GetByIdAsync(reservationId);
-            if (reservation == null)
-                throw new NotFoundException("Reservation not found");
-
-            reservation.Status = ReservationStatus.Confirmed;
-            reservationRepo.Update(reservation);
-            await _unitOfWork.CompleteAsync();
-        }
-
-        public async Task CancelReservation(int reservationId)
-        {
-            var reservationRepo = _unitOfWork.Repository<Core.Entities.Reservation, int>();
-            var bedRepo = _unitOfWork.Repository<Beds, int>();
-            var roomRepo = _unitOfWork.Repository<Core.Entities.Rooms, int>();
-            var apartmentRepo = _unitOfWork.Repository<Apartment, int>();
-
-            var reservation = await reservationRepo.GetByIdAsync(reservationId,
-                include: r => r.Include(x => x.Bed)
-                              .ThenInclude(b => b.Room)
-                              .Include(x => x.Apartment));
-
-            if (reservation == null)
-                throw new NotFoundException("Reservation not found");
-
-            reservation.Status = ReservationStatus.Cancelled;
-             reservationRepo.Update(reservation);
-
-            // Update bed status
-            var bed = reservation.Bed;
-            bed.IsAvailable = true;
-             bedRepo.Update(bed);
-
-            // Update room available beds
-            var room = bed.Room;
-            room.AvailableBeds++;
-             roomRepo.Update(room);
-
-            // Update apartment available beds
-            var apartment = reservation.Apartment;
-            apartment.AvailableBeds++;
-             apartmentRepo.Update(apartment);
-
-            await _unitOfWork.CompleteAsync();
-        }
- */

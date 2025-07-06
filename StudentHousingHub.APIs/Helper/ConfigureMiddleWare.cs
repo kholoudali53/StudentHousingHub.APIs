@@ -71,6 +71,8 @@ namespace StudentHousingHub.APIs.Helper
 
             app.UseHttpsRedirection();
 
+            app.UseRouting();
+
             app.UseAuthentication();
             app.UseAuthorization();
 

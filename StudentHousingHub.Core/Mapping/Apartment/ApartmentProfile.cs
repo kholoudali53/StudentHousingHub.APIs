@@ -26,7 +26,9 @@ namespace StudentHousingHub.Core.Mapping.Apartment
             .ForMember(d => d.OwnerName, O => O.MapFrom(s => $"{s.Owner.FirstName} {s.Owner.LastName}".Trim()))
             .ForMember(dest => dest.AvailableRooms, opt => opt.MapFrom(src => src.Rooms))
             .ForMember(d => d.Images, O => O.MapFrom(new PictureUrlResolver(configuration)))
-            .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.PriceMonthly));
+            .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.PriceMonthly))
+
+            .ForMember(a => a.Actions, o => o.MapFrom(a => a.Actions.ToString()));
 
             CreateMap<AddApartmentDto, Entities.Apartment>()
                 .ForMember(dest => dest.Rooms, opt => opt.MapFrom(src => src.AvailableRooms));

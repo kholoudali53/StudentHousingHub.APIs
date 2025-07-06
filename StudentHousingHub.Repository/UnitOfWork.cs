@@ -36,12 +36,5 @@ namespace StudentHousingHub.Repository
             }
             return _repositories[type] as IGenericRepository<TEntity, TKey>;
         }
-
-        /*
-        public async Task<IDbContextTransaction> BeginTransactionAsync()
-        {
-            return await _context.Database.BeginTransactionAsync();
-        }
-        */
     }
 }

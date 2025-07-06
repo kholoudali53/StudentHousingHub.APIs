@@ -12,7 +12,7 @@ using StudentHousingHub.Repository.Data.Contexts;
 namespace StudentHousingHub.Repository.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250509154417_AddAppModuleTables")]
+    [Migration("20250608164215_AddAppModuleTables")]
     partial class AddAppModuleTables
     {
         /// <inheritdoc />
@@ -85,6 +85,9 @@ namespace StudentHousingHub.Repository.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
+                    b.Property<int>("Actions")
+                        .HasColumnType("int");
+
                     b.Property<string>("Address")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -101,8 +104,9 @@ namespace StudentHousingHub.Repository.Data.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
-                    b.Property<int>("Floor")
-                        .HasColumnType("int");
+                    b.Property<string>("Floor")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Gender")
                         .IsRequired()
@@ -138,8 +142,6 @@ namespace StudentHousingHub.Repository.Data.Migrations
 
                     b.ToTable("Apartments", t =>
                         {
-                            t.HasCheckConstraint("CK_Apartments_Floor", "[Floor] BETWEEN 0 AND 50");
-
                             t.HasCheckConstraint("CK_Apartments_Gender", "[Gender] IN ('Male', 'Female', 'Other')");
                         });
                 });
@@ -509,6 +511,33 @@ namespace StudentHousingHub.Repository.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("StudentHousingHub.Core.Identity.ApppUserr", b =>
+                {
+                    b.Property<string>("id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Ownerid")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Studentid")
+                        .HasColumnType("int");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("Ownerid");
+
+                    b.HasIndex("Studentid");
+
+                    b.ToTable("users");
+                });
+
             modelBuilder.Entity("StudentHousingHub.Core.Entities.Apartment", b =>
                 {
                     b.HasOne("StudentHousingHub.Core.Entities.Owners", "Owner")
@@ -639,6 +668,25 @@ namespace StudentHousingHub.Repository.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Admin");
+                });
+
+            modelBuilder.Entity("StudentHousingHub.Core.Identity.ApppUserr", b =>
+                {
+                    b.HasOne("StudentHousingHub.Core.Entities.Owners", "Owner")
+                        .WithMany()
+                        .HasForeignKey("Ownerid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("StudentHousingHub.Core.Entities.Students", "Student")
+                        .WithMany()
+                        .HasForeignKey("Studentid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Owner");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("StudentHousingHub.Core.Entities.Admin", b =>

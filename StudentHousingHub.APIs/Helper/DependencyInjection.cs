@@ -19,6 +19,9 @@ using StudentHousingHub.Service.Services.Users;
 using StudentHousingHub.Core.Mapping.Reservation;
 using StudentHousingHub.Core.Mapping.Apartment;
 using StudentHousingHub.Service.Services.Reservation;
+using StudentHousingHub.Service.Services.Reports;
+using StudentHousingHub.Core.Mapping.Report;
+using StudentHousingHub.Core.Entities;
 
 namespace StudentHousingHub.APIs.Helper
 {
@@ -80,6 +83,9 @@ namespace StudentHousingHub.APIs.Helper
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IReservationService, ReservationService>();
+            services.AddScoped<IReportService, ReportService>();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
+
 
             return services;
         }
@@ -88,6 +94,7 @@ namespace StudentHousingHub.APIs.Helper
         {
             services.AddAutoMapper(M => M.AddProfile(new ApartmentProfile(configuration)));
             services.AddAutoMapper(M => M.AddProfile(new ReservationProfile()));
+            services.AddAutoMapper(M => M.AddProfile(new ReportProfile()));
             services.AddAutoMapper(typeof(Program));
 
             return services;

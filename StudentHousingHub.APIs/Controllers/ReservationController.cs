@@ -27,7 +27,7 @@ namespace StudentHousingHub.APIs.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ReservationResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> CreateReservation([FromBody] ReservationDto reservationDto)
         {
             _logger.LogInformation("Received reservation creation request");
@@ -65,7 +65,7 @@ namespace StudentHousingHub.APIs.Controllers
         [HttpGet("search")]
         [ProducesResponseType(typeof(IEnumerable<ReservationDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> SearchReservations([FromQuery] SearchReservationDto searchDto)
         {
             try
@@ -80,35 +80,32 @@ namespace StudentHousingHub.APIs.Controllers
                 return BadRequest(new ApiErrorResponse(400, ex.Message));
             }
         }
+
+        [HttpPut("{id}/cancel")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
+        [Authorize]
+        public async Task<IActionResult> CancelReservation(int id)
+        {
+            _logger.LogInformation("Cancellation request for reservation {ReservationId}", id);
+
+            try
+            {
+                var result = await _reservationService.CancelReservationAsync(id);
+
+                if (result)
+                {
+                    return Ok(new { Message = "Reservation cancelled successfully" });
+                }
+
+                return BadRequest(new ApiErrorResponse(400, "Reservation could not be cancelled"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error cancelling reservation {ReservationId}", id);
+                return BadRequest(new ApiErrorResponse(400, ex.Message));
+            }
+        }
+
     }
 }
-
-//if (reservationDto == null)
-//{
-//    return BadRequest(new ApiErrorResponse(400, "Reservation information must be sent"));
-//}
-
-//// التحقق من صحة البيانات
-//if (!ModelState.IsValid)
-//{
-//    var errors = ModelState.Values
-//        .SelectMany(v => v.Errors)
-//        .Select(e => e.ErrorMessage)
-//        .ToList();
-
-//    return BadRequest(new ApiErrorResponse(400, "invalid data"));
-//}
-
-//try
-//{
-//    /*if (!ModelState.IsValid)
-//        return BadRequest(ModelState);*/
-
-//    var result = await _reservationService.CreateReservationAsync(reservationDto);
-//    return Ok(result);
-
-//}
-//catch (Exception ex)
-//{
-//    return BadRequest(new ApiErrorResponse(400, "Error While creating reservation"));
-//}

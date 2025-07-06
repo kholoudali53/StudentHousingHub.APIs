@@ -1,4 +1,4 @@
-﻿/*using StudentHousingHub.Core.Dtos.Apartments;
+﻿using StudentHousingHub.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace StudentHousingHub.Core.Services.Interface
 {
-    public interface IAddApartmentService
+    public interface ICurrentUserService
     {
-        Task<ApartmentDto> AddApartment(ApartmentDto apartmentDto);
+        string GetUserEmail();
+        //Task<CurrentUser> GetCurrentUserAsync();
     }
-    
-*/
+}

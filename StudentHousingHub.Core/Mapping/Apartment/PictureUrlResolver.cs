@@ -25,7 +25,6 @@ namespace StudentHousingHub.Core.Mapping.Apartment
             if (source.Images == null || source.Images.Count == 0)
                 return result;
 
-            // أخذ أقصى 5 صور وإضافة الرابط الأساسي لكل صورة
             var imagesToTake = Math.Min(source.Images.Count, 5);
             for (int i = 0; i < imagesToTake; i++)
             {
@@ -36,7 +35,6 @@ namespace StudentHousingHub.Core.Mapping.Apartment
             }
 
             return result;
-           // return string.Empty;
         }
     }
 }

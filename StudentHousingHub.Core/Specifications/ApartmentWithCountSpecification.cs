@@ -30,7 +30,8 @@ namespace StudentHousingHub.Core.Specifications
                     (p.Address != null && p.Address.ToLower().Contains(parameters.Address.ToLower()))) &&
                     (string.IsNullOrEmpty(parameters.Gender) ||
                     (p.Gender != null && p.Gender.ToLower() == parameters.Gender.ToLower())) &&
-                    (!parameters.Floor.HasValue || p.Floor == parameters.Floor) &&
+                    (string.IsNullOrEmpty(parameters.Floor) ||
+                    (p.Floor != null && p.Floor.ToLower() == parameters.Floor.ToLower())) &&
                     (!parameters.PriceFrom.HasValue || p.PriceMonthly >= parameters.PriceFrom) &&
                     (!parameters.PriceTo.HasValue || p.PriceMonthly <= parameters.PriceTo) &&
                     (!parameters.OwnerId.HasValue || parameters.OwnerId == p.OwnerId);
@@ -45,70 +46,3 @@ namespace StudentHousingHub.Core.Specifications
         }
     }
 }
-/*
- public class RoomWithCountSpecification : BaseSpecification<Entities.Rooms, int>
-    {
-        public RoomWithCountSpecification(RoomSpecParameters roomSpecParameters)
-            : base(P => roomSpecParameters.IsAdvancedSearch
-                ? AdvancedSearchPredicate(P, roomSpecParameters)
-                : BasicSearchPredicate(P, roomSpecParameters))
-        {
-        }
-
-        private static Expression<Func<Entities.Rooms, bool>> BasicSearchPredicate(
-            Entities.Rooms room,
-            RoomSpecParameters parameters)
-        {
-            return P =>
-                (string.IsNullOrEmpty(parameters.UniversitySearch) ||
-                P.UniversityName.ToLower().Contains(parameters.UniversitySearch))
-                &&
-                (!parameters.OwnerId.HasValue || parameters.OwnerId == P.OwnerId);
-        }
-
-        private static Expression<Func<Entities.Rooms, bool>> AdvancedSearchPredicate(
-            Entities.Rooms room,
-            RoomSpecParameters parameters)
-        {
-            return P =>
-                (string.IsNullOrEmpty(parameters.UniversitySearch) ||
-                P.UniversityName.ToLower().Contains(parameters.UniversitySearch))
-                &&
-                (string.IsNullOrEmpty(parameters.Location) ||
-                (P.Address != null && P.Address.ToLower().Contains(parameters.Location)))
-                &&
-                (string.IsNullOrEmpty(parameters.Gender) ||
-                P.Gender.ToLower() == parameters.Gender)
-                &&
-                (!parameters.Floor.HasValue || P.Floor == parameters.Floor)
-                &&
-                (!parameters.PriceFrom.HasValue || P.Price >= parameters.PriceFrom)
-                &&
-                (!parameters.PriceTo.HasValue || P.Price <= parameters.PriceTo)
-                &&
-                (!parameters.OwnerId.HasValue || parameters.OwnerId == P.OwnerId);
-        }
-    }
- */
-
-/*
- 
- public class RoomWithCountSpecification : BaseSpecification<Entities.Rooms, int>
-    {
-        public RoomWithCountSpecification(RoomSpecParameters roomSpecParameters)
-            : base
-            (
-                 P =>
-                 (string.IsNullOrEmpty(roomSpecParameters.UniversitySearch) ||
-                    P.UniversityName.ToLower().Contains(roomSpecParameters.UniversitySearch))
-                 &&
-                 (!roomSpecParameters.OwnerId.HasValue || roomSpecParameters.OwnerId == P.OwnerId)
-                 
-                 
-
-            )
-        {
-        }
-    }
- 
- */

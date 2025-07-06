@@ -18,6 +18,7 @@ namespace StudentHousingHub.Core.Entities
         public string Email { get; set; }
         public string PhoneNo { get; set; }
 
+
         // Foreign Key for Admin
         public int AdminId { get; set; }
         public Admin Admin { get; set; }

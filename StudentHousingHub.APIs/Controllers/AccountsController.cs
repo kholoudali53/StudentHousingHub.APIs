@@ -42,7 +42,7 @@ namespace StudentHousingHub.APIs.Controllers
         }
 
         [HttpGet("GetCurrentUser")] // Get : /api/Accounts/GetCurrentUser
-        [Authorize]
+        //[Authorize]
         public async Task<ActionResult<UserDto>> GetCurrentUser()
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);

@@ -65,7 +65,7 @@ namespace StudentHousingHub.Repository.Data.Configurations
 
             // Check constraints
             builder.HasCheckConstraint("CK_Apartments_Gender", "[Gender] IN ('Male', 'Female', 'Other')");
-            builder.HasCheckConstraint("CK_Apartments_Floor", "[Floor] BETWEEN 0 AND 50");
+            //builder.HasCheckConstraint("CK_Apartments_Floor", "[Floor] BETWEEN 0 AND 50");
 
             // Relationships
             builder.HasOne(a => a.Owner)

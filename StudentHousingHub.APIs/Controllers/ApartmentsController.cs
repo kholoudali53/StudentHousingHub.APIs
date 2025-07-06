@@ -10,7 +10,6 @@ using StudentHousingHub.Core.Helper;
 using StudentHousingHub.Core.Services.Interface;
 using StudentHousingHub.Core.Specifications;
 using StudentHousingHub.Service.Services.Rooms;
-
 namespace StudentHousingHub.APIs.Controllers
 {
     public class ApartmentsController : BaseApiController
@@ -22,11 +21,21 @@ namespace StudentHousingHub.APIs.Controllers
             _apartmentsService = apartmentsService;
         }
 
+        //[HttpGet] // Get BaseURL/api/Apartments
+        //[ProducesResponseType(typeof(PaginationResponse<ApartmentDto>), StatusCodes.Status200OK)]
+        //[Authorize]
+        //public async Task<ActionResult<PaginationResponse<ApartmentDto>>> GetAllApartments()
+        //{
+
+        //    var result = await _apartmentsService.GetAllApartmentsAsync();
+        //    return Ok(result);
+        //}
+
         [HttpGet] // Get BaseURL/api/Apartments
         [ProducesResponseType(typeof(PaginationResponse<ApartmentDto>), StatusCodes.Status200OK)]
        // [Cached(10)]
-        [Authorize]
-        public async Task<ActionResult<PaginationResponse<ApartmentDto>>> GetAllApartments([FromQuery] ApartmentSpecParameters apartmentSpecParameters)
+        //[Authorize]
+        public async Task<ActionResult<PaginationResponse<ApartmentDto>>> GetAllApartmentsAsync([FromQuery] ApartmentSpecParameters apartmentSpecParameters)
         {
 
             var result = await _apartmentsService.GetAllApartmentsAsync(apartmentSpecParameters);
@@ -37,7 +46,7 @@ namespace StudentHousingHub.APIs.Controllers
         [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
         [HttpGet("{id}")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> GetApartmentById(int? id)
         {
             if (id is null) return BadRequest(new ApiErrorResponse(400));
@@ -52,7 +61,7 @@ namespace StudentHousingHub.APIs.Controllers
         [HttpPost("AddApartment")]
         [ProducesResponseType(typeof(ApartmentDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
-        [Authorize]
+        //[Authorize]
         public async Task<ActionResult> AddApartment([FromBody] AddApartmentDto apartmentDto)
         {
             try
@@ -69,6 +78,39 @@ namespace StudentHousingHub.APIs.Controllers
             {
                 return BadRequest(new ApiErrorResponse(400, "An error occurred while adding the apartment"));
             }
+        }
+
+        [HttpDelete("{id}/delete")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
+        //[Authorize]
+        public async Task<IActionResult> DeleteApartment([FromRoute] int id)
+        {
+            var result = await _apartmentsService.DeleteApartmentAsync(id);
+            if (!result) return NotFound(new ApiErrorResponse(404, "Apartment not found"));
+            return Ok(result);
+        }
+
+        [HttpPut("{id}/suspend")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
+        //[Authorize]
+        public async Task<IActionResult> SuspendApartment(int id)
+        {
+            var result = await _apartmentsService.SuspendApartmentAsync(id);
+            if (!result) return NotFound(new ApiErrorResponse(404, "Apartment not found"));
+            return Ok(result);
+        }
+
+        [HttpPut("{id}/active")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
+        //[Authorize]
+        public async Task<IActionResult> ActiveApartment(int id)
+        {
+            var result = await _apartmentsService.ActiveApartmentAsync(id);
+            if (!result) return NotFound(new ApiErrorResponse(404, "Apartment not found"));
+            return Ok(result);
         }
     }
 }

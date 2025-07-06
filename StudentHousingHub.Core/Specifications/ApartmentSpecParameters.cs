@@ -28,7 +28,7 @@ namespace StudentHousingHub.Core.Specifications
         // GET /api/rooms?SearchType=2&Address=المعادي&Gender=ذكر&Floor=2&PriceFrom=500&PriceTo=1000
         private string? address;
         private string? gender;
-        private int? floor;
+        private string? floor;
 
         [StringLength(100, ErrorMessage = "Address cannot exceed 100 characters")]
         //public string? Address
@@ -45,8 +45,8 @@ namespace StudentHousingHub.Core.Specifications
         //}
         public string? Gender { get; set; }
 
-        [Range(1, 50, ErrorMessage = "Floor must be between 1 and 50")]
-        public int? Floor
+        [StringLength(20, ErrorMessage = "Floor cannot exceed 20 characters")]
+        public string? Floor
         {
             get => floor;
             set => floor = value;

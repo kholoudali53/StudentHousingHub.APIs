@@ -99,17 +99,17 @@ namespace StudentHousingHub.Repository.Data.Migrations
                     Address = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Gender = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: false),
                     Space = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Floor = table.Column<int>(type: "int", nullable: false),
+                    Floor = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Amenities = table.Column<int>(type: "int", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
                     PriceMonthly = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Actions = table.Column<int>(type: "int", nullable: false),
                     OwnerId = table.Column<int>(type: "int", nullable: false),
                     CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Apartments", x => x.id);
-                    table.CheckConstraint("CK_Apartments_Floor", "[Floor] BETWEEN 0 AND 50");
                     table.CheckConstraint("CK_Apartments_Gender", "[Gender] IN ('Male', 'Female', 'Other')");
                     table.ForeignKey(
                         name: "FK_Apartments_Owners_OwnerId",
@@ -180,6 +180,33 @@ namespace StudentHousingHub.Repository.Data.Migrations
                     table.ForeignKey(
                         name: "FK_Reports_Students_StudentId",
                         column: x => x.StudentId,
+                        principalTable: "Students",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "users",
+                columns: table => new
+                {
+                    id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DisplayName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Studentid = table.Column<int>(type: "int", nullable: false),
+                    Ownerid = table.Column<int>(type: "int", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_users", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_users_Owners_Ownerid",
+                        column: x => x.Ownerid,
+                        principalTable: "Owners",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_users_Students_Studentid",
+                        column: x => x.Studentid,
                         principalTable: "Students",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -388,6 +415,16 @@ namespace StudentHousingHub.Repository.Data.Migrations
                 table: "Students",
                 column: "PhoneNo",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_users_Ownerid",
+                table: "users",
+                column: "Ownerid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_users_Studentid",
+                table: "users",
+                column: "Studentid");
         }
 
         /// <inheritdoc />
@@ -401,6 +438,9 @@ namespace StudentHousingHub.Repository.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Reservations");
+
+            migrationBuilder.DropTable(
+                name: "users");
 
             migrationBuilder.DropTable(
                 name: "Beds");

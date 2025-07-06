@@ -32,6 +32,11 @@ namespace StudentHousingHub.Service.Services.Rooms
             _context = context;
         }
 
+        //public async Task<IEnumerable<ApartmentDto>> GetAllApartmentsAsync()
+        //{
+        //    return _mapper.Map<IEnumerable<ApartmentDto>>(await _unitOfWork.Repository<Apartment, int>().GetAllAsync());
+        //}
+
         public async Task<PaginationResponse<ApartmentDto>> GetAllApartmentsAsync(ApartmentSpecParameters apartmentSpecParameters)
         {
             var spec = new ApartmentSpecification(apartmentSpecParameters);
@@ -42,9 +47,9 @@ namespace StudentHousingHub.Service.Services.Rooms
             {
                 await _unitOfWork.Repository<Apartment, int>()
                     .GetByIdAsync(apartment.id, include: q => q
-                        .Include(a => a.Owner)
-                        .Include(a => a.Rooms)
-                            .ThenInclude(r => r.Beds));
+                    .Include(a => a.Owner)
+                    .Include(a => a.Rooms)
+                    .ThenInclude(r => r.Beds));
             }
 
             var mappedRooms = _mapper.Map<IEnumerable<ApartmentDto>>(apartments);
@@ -103,6 +108,40 @@ namespace StudentHousingHub.Service.Services.Rooms
            .ThenInclude(r => r.Beds));
 
             return _mapper.Map<ApartmentDto>(fullApartment);
+        }
+
+        public async Task<bool> DeleteApartmentAsync(int id)
+        {
+            var apartment = await _unitOfWork.Repository<Apartment, int>().GetByIdAsync(id);
+            if (apartment == null) return false;
+
+            apartment.Actions = ApartmentStatus.Delete; 
+            await _unitOfWork.CompleteAsync();
+
+            // _unitOfWork.Repository<Apartment, int>().Delete(apartment);
+            // await _unitOfWork.CompleteAsync();
+
+            return true;
+        }
+
+        public async Task<bool> SuspendApartmentAsync(int id)
+        {
+            var apartment = await _unitOfWork.Repository<Apartment, int>().GetByIdAsync(id);
+            if (apartment == null) return false;
+
+            apartment.Actions = ApartmentStatus.Suspend;
+            await _unitOfWork.CompleteAsync();
+            return true;
+        }
+
+        public async Task<bool> ActiveApartmentAsync(int id)
+        {
+            var apartment = await _unitOfWork.Repository<Apartment, int>().GetByIdAsync(id);
+            if (apartment == null) return false;
+
+            apartment.Actions = ApartmentStatus.Active;
+            await _unitOfWork.CompleteAsync();
+            return true;
         }
     }
 }

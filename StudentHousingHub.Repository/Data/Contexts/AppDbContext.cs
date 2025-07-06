@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StudentHousingHub.Core.Entities;
+using StudentHousingHub.Core.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,5 +31,6 @@ namespace StudentHousingHub.Repository.Data.Contexts
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<ContactUs> Contacts { get; set; }
         public DbSet<Reports> Reports { get; set; }
+        public DbSet<ApppUserr> users { get; set; }
     }
 }

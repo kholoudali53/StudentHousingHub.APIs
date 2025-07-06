@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using StudentHousingHub.Core.Dtos.Apartments;
-
 namespace StudentHousingHub.Core.Entities
 {
     public enum Amenities
@@ -28,7 +27,7 @@ namespace StudentHousingHub.Core.Entities
         public string Address { get; set; }
         public string Gender { get; set; }
         public decimal Space { get; set; }
-        public int Floor { get; set; }
+        public string Floor { get; set; }
         public List<Rooms> Rooms { get; set; } = new List<Rooms>();
         public List<Beds> Beds { get; set; } = new List<Beds>();
         public Amenities? Amenities { get; set; }
@@ -36,14 +35,19 @@ namespace StudentHousingHub.Core.Entities
 
         public decimal PriceMonthly { get; set; }
 
+        public ApartmentStatus Actions { get; set; } = ApartmentStatus.Active;
+
         // Foreign Key for Owner
         public int OwnerId { get; set; }
         public Owners Owner { get; set; }
         public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
 
-        //public ICollection<Rooms> Room { get; set; } = new List<Rooms>();
 
     }
+    public enum ApartmentStatus
+    {
+        Suspend,
+        Delete,
+        Active
+    }
 }
-// لما اعمل ادد البيانات تتسجل في الداتا بيز
-// 
